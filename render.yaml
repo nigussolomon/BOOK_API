@@ -1,7 +1,7 @@
 services:
   - name: web
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host=0.0.0.0 --port=$PORT
+    startCommand: uvicorn app:app --host=0.0.0.0 --port=$PORT
     env:
       - DATABASE_URL=postgres://nigussolomon:z3P2YqxtXmCopQ2NXyXDyrnUYqSuzAwy@dpg-cgpb7r0rddl9mmueu1t0-a/books_kf2n
       - ENVIRONMENT=production
