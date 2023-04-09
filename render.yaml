@@ -1,7 +1,19 @@
 services:
   - name: web
-    dockerfile: Dockerfile
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host=0.0.0.0 --port=$PORT
     env:
-      PYTHONUNBUFFERED: 1
-    ports:
-      - 8080:80
+      - DATABASE_URL=postgres://nigussolomon:z3P2YqxtXmCopQ2NXyXDyrnUYqSuzAwy@dpg-cgpb7r0rddl9mmueu1t0-a/books_kf2n
+      - ENVIRONMENT=production
+    healthCheck:
+      path: /docs
+      port: $PORT
+      protocol: http
+      timeout: 5000
+      unhealthyThreshold: 2
+      healthyThreshold: 2
+    headers:
+      Referrer-Policy: no-referrer
+      Access-Control-Allow-Headers: content-type
+    autoDeploy:
+      branch: main
