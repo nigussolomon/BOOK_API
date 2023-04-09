@@ -87,3 +87,11 @@ async def download_book(book_id: int):
     file_path = book_orm.bookfile
     return FileResponse(file_path)
 
+# Define the endpoint to delete all books
+@app.delete("/books")
+async def delete_books():
+    session = SessionLocal()
+    session.query(BookORM).delete()
+    session.commit()
+    session.close()
+    return {"message": "All books deleted successfully"}
