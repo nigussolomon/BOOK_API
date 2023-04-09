@@ -1,0 +1,7 @@
+services:
+  - name: web
+    dockerfile: Dockerfile
+    env:
+      PYTHONUNBUFFERED: 1
+    ports:
+      - 8080:80
