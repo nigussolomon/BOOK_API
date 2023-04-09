@@ -4,8 +4,8 @@ services:
       - key: DATABASE_URL
         value: postgres://nigussolomon:z3P2YqxtXmCopQ2NXyXDyrnUYqSuzAwy@dpg-cgpb7r0rddl9mmueu1t0-a/books_kf2n
     dockerfile: Dockerfile
-    buildCommand: docker build -t $IMAGE_NAME .
-    startCommand: docker run --env-file .env -p $PORT:$PORT -e PORT=$PORT $IMAGE_NAME
+    # buildCommand: docker build -t $IMAGE_NAME .
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     healthCheck:
       tcp: $PORT
     envVars:
