@@ -40,10 +40,19 @@ Base.metadata.create_all(bind=engine)
 # Define the endpoint to get all books
 @router.get("/books")
 async def get_books():
-    session = SessionLocal()
-    books = session.query(BookORM).all()
-    session.close()
-    return books
+    try:
+        session = SessionLocal()
+        books = session.query(BookORM).all()
+        if books != []:
+            return {"books": books, "status": "success"}
+        else:
+            return {"boooks": "No boooks found", "status": "success"}
+    except:
+        raise HTTPException(status_code=500, detail="Unexpected Error")
+    finally:
+        session.close()
+    
+
 
 # Define the endpoint to get a specific book by ID
 @router.get("/books/{book_id}")
