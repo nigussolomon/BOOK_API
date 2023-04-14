@@ -1,19 +1,20 @@
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import  File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import List
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import shutil
 from fastapi import APIRouter
+import os
 
 router = APIRouter()
 # Define the Book model
 class Book(BaseModel):
     bookname: str
-    author: str
+    author_name: str
+    author_id: int
     bookfile: str
 
 
@@ -29,7 +30,8 @@ class BookORM(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     bookname = Column(String, unique=True)
-    author = Column(String)
+    author_name = Column(String)
+    author_id = Column(Integer)
     bookfile = Column(String)
 
 # Create the books table in the database
@@ -53,23 +55,27 @@ async def get_book(book_id: int):
 
 # Define the endpoint to add a book
 @router.post("/books")
-async def add_book(bookname: str = Form(...), author: str = Form(...), bookfile: UploadFile = File(...)):
+async def add_book(bookname: str = Form(...), author_name: str = Form(...), authorid: int = Form(...), bookfile: UploadFile = File(...)):
     # Save the uploaded file to disk
+    path = 'books'
+    isExist = os.path.exists(path)
+    if  not isExist:
+        os.system("mkdir books")
     file_location = f"books/{bookfile.filename}"
-    with open(file_location, "wb") as file:
-        shutil.copyfileobj(bookfile.file, file)
-    book = Book(bookname=bookname, author=author, bookfile=file_location)
+    book = Book(bookname=bookname, author_name=author_name, author_id=authorid, bookfile=file_location)
     session = SessionLocal()
-    book_orm = BookORM(bookname=book.bookname, author=book.author, bookfile=book.bookfile)
+    book_orm = BookORM(bookname=book.bookname, author_name=book.author_name, author_id=book.author_id, bookfile=book.bookfile)
     try:
         session.add(book_orm)
         session.commit()
+        with open(file_location, "wb") as file:
+            shutil.copyfileobj(bookfile.file, file)
     except IntegrityError:
         session.rollback()
         raise HTTPException(status_code=400, detail="Book already exists")
     finally:
         session.close()
-    return {"message": "Book added successfully"}
+    return {"message": "Book added successfully", "status": "success"}
 
 # Define the endpoint to download a book file
 @router.get("/books/{book_id}/download")
@@ -85,7 +91,14 @@ async def download_book(book_id: int):
 @router.delete("/books")
 async def delete_books():
     session = SessionLocal()
-    session.query(BookORM).delete()
-    session.commit()
-    session.close()
-    return {"message": "All books deleted successfully"}
+    path = './books'
+    isExist = os.path.exists(path)
+    if session.query(BookORM).all() == []:
+        raise HTTPException(status_code=404, detail="Nothing to delete")
+    else:
+        if  isExist == True:
+            os.system("rm -rf ./books/*")
+        session.query(BookORM).delete()
+        session.commit()
+        session.close()
+    return {"message": "All books deleted successfully", "status": "success"}
