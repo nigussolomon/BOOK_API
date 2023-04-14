@@ -96,9 +96,21 @@ async def download_book(book_id: int):
     file_path = book_orm.bookfile
     return FileResponse(file_path)
 
+@router.delete("/book/{book_id}")
+async def delete_book(book_id: int):
+    session = SessionLocal()
+    book = session.query(BookORM).filter(BookORM.id == book_id).first()
+    if book is None:
+        return {"message": "Nothing to delete", "status": "failed"}
+    else:
+        session.query(BookORM).filter(BookORM.id == book_id).delete()
+        session.commit()
+        session.close()
+        return {"message": "Book deleted successfully", "status": "success"}
+    
 # Define the endpoint to delete all books
 @router.delete("/books")
-async def delete_books():
+async def delete_all_books():
     session = SessionLocal()
     path = './books'
     isExist = os.path.exists(path)

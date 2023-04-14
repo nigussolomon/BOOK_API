@@ -96,7 +96,7 @@ async def delete_favourite(favourite_id: int):
         session.query(FavouriteORM).filter(FavouriteORM.id == favourite_id).delete()
         session.commit()
         session.close()
-        return {"message": "Favourite deleted successfully"}
+        return {"message": "Favourite deleted successfully", "status": "success"}
 
 @router.delete("/favorites")
 async def delete_all_favourites():

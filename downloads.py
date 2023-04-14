@@ -98,7 +98,7 @@ async def delete_download(download_id: int):
         session.query(DownloadORM).filter(DownloadORM.id == download_id).delete()
         session.commit()
         session.close()
-        return {"message": "Download deleted successfully"}
+        return {"message": "Download deleted successfully", "status": "success"}
 
 @router.delete("/downloads")
 async def delete_all_downloads():
