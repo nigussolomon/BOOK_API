@@ -123,3 +123,20 @@ async def delete_all_books():
         session.commit()
         session.close()
     return {"message": "All books deleted successfully", "status": "success"}
+
+@router.put("/book/{book_id}")
+async def update_book(book_id: int, bookname: str = Form(...), author_name: str = Form(...), authorid: int = Form(...), bookfile: UploadFile = File(...)):
+    session = SessionLocal()
+    book = session.query(BookORM).filter(BookORM.id == book_id).first()
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    else:
+        file_location = f"books/{bookfile.filename}"
+        with open(file_location, "wb") as file:
+            shutil.copyfileobj(bookfile.file, file)
+        book_orm = BookORM(bookname=bookname, author_name=author_name, author_id=authorid, bookfile=book.bookfile)
+        session.query(BookORM).filter(BookORM.id == book_id).update({BookORM.bookname: book_orm.bookname, BookORM.author_name: book_orm.author_name, BookORM.author_id: book_orm.author_id, BookORM.bookfile: book_orm.bookfile})
+        session.commit()
+        os.system(f"rm -rf {book.bookfile}")
+        session.close()
+        return {"message": "Book updated successfully", "status": "success"}
