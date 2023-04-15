@@ -9,6 +9,6 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
-app.include_router(booksRouter, tags=["books"], prefix="/books") # prefix="/books" is used to add a prefix to all the routes in the booksRouter (booksRouter
-app.include_router(favouritesRouter, tags=["favourites"], prefix="/favourites") # prefix="/favourites" is used to add a prefix to all the routes in the favouritesRouter (favouritesRouter
-app.include_router(downloadsRouter, tags=["downloads"], prefix="/downloads")
+app.include_router(booksRouter, tags=["books"]) # prefix="/books" is used to add a prefix to all the routes in the booksRouter (booksRouter
+app.include_router(favouritesRouter, tags=["favourites"]) # prefix="/favourites" is used to add a prefix to all the routes in the favouritesRouter (favouritesRouter
+app.include_router(downloadsRouter, tags=["downloads"])
