@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from books import BookORM
@@ -8,7 +8,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 class Download(BaseModel):
-    userid: int
+    userid: str
     bookid: int
 
 
@@ -22,13 +22,13 @@ class DownloadORM(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     bookid = Column(Integer)
-    userid = Column(Integer)
+    userid = Column(String)
 
 Base.metadata.create_all(bind=engine)
 
 
 @router.get("/downloads/{user_id}")
-async def get_downloads(user_id: int):
+async def get_downloads(user_id: str):
     try:
         downloads = []
         session = SessionLocal()
@@ -67,7 +67,7 @@ async def get_download(download_id: int):
 
 
 @router.post("/downloads")
-async def add_download(bookid: int, userid: int):
+async def add_download(bookid: int, userid: str):
     try:
         download = Download(userid=userid, bookid=bookid)
         session = SessionLocal()
