@@ -1,4 +1,4 @@
-from fastapi import  File, Form, HTTPException, UploadFile
+from fastapi import  File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String
@@ -140,3 +140,18 @@ async def update_book(book_id: int, bookname: str = Form(...), author_name: str 
         os.system(f"rm -rf {book.bookfile}")
         session.close()
         return {"message": "Book updated successfully", "status": "success"}
+
+@router.get("/search")
+async def search_book(bookname: str = Query(None), authorname: str = Query(None)):
+    session = SessionLocal()
+    book = session.query(BookORM).filter(BookORM.bookname == bookname).all()
+    bookAuthors = session.query(BookORM).filter(BookORM.author_name == authorname).all()
+    if book is not  None and bookAuthors is not  None:
+        unique_values = set(book).union(set(bookAuthors))
+    elif book is None:
+        unique_values = set(bookAuthors)
+    elif  bookAuthors is None:
+        unique_values = set(book)
+    else: unique_values = []
+    session.close()
+    return unique_values
