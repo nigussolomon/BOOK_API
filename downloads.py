@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from books import BookORM
 from fastapi import APIRouter
+from fastapi.responses import FileResponse
 
 router = APIRouter()
 class Download(BaseModel):
@@ -59,7 +60,7 @@ async def get_download(download_id: int):
         download = session.query(DownloadORM).filter(DownloadORM.id == download_id).first()
         book = session.query(BookORM).filter(BookORM.id == download.bookid).first()
         session.close()
-        return {"bookData": {"id": book.id, "bookname": book.bookname, "author": book.author_name}, "bookFile":book, "status": "success"}
+        return FileResponse(book.bookfile, media_type='application/pdf')
     except:
         raise HTTPException(status_code=500, detail="Unexpected Error")
     finally:
