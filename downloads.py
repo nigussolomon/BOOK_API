@@ -59,7 +59,7 @@ async def get_download(download_id: int):
         download = session.query(DownloadORM).filter(DownloadORM.id == download_id).first()
         book = session.query(BookORM).filter(BookORM.id == download.bookid).first()
         session.close()
-        return {"book": {"id": book.id, "bookname": book.bookname, "author": book.author_name}, "status": "success"}
+        return {"bookData": {"id": book.id, "bookname": book.bookname, "author": book.author_name}, "bookFile":book, "status": "success"}
     except:
         raise HTTPException(status_code=500, detail="Unexpected Error")
     finally:

@@ -1,6 +1,6 @@
 from fastapi import  Form, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from books import BookORM
@@ -8,7 +8,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 class Favourite(BaseModel):
-    userid: int
+    userid: str
     bookid: int
 
 
@@ -21,14 +21,14 @@ class FavouriteORM(Base):
     __tablename__ = "favourites"
 
     id = Column(Integer, primary_key=True, index=True)
-    userid = Column(Integer)
+    userid = Column(String)
     bookid = Column(Integer)
 
 Base.metadata.create_all(bind=engine)
 
 
 @router.get("/favourites/{user_id}")
-async def get_favourites(user_id: int):
+async def get_favourites(user_id: str):
     try:
         favourites = []
         session = SessionLocal()
@@ -65,7 +65,7 @@ async def get_favourite(favourite_id: int):
         session.close()
 
 @router.post("/favourites")
-async def add_favourite(bookid: int = Form(...), userid: int = Form(...)):
+async def add_favourite(bookid: int = Form(...), userid: str = Form(...)):
     try:
         favourite = Favourite(bookid=bookid, userid=userid)
         session = SessionLocal()
