@@ -83,7 +83,7 @@ async def add_download(bookid: int, userid: str):
                 return {"message": "Books already downloaded", "status": "success"}
         else:
             return {"message": "Book Doesn't Exist", "status": "failed"}
-        return {"message": "Downloaded  successfully", "status": "success"}
+        return {"message": "Downloaded  successfully", "status": "success", "id": download_orm.id}
     except:
         raise HTTPException(status_code=500, detail="Unexpected Error")
     finally:
