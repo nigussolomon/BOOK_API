@@ -1,0 +1,10 @@
+services:
+  - name: app
+    dockerCompose:
+      path: docker-compose.yml
+    env:
+      - key: DATABASE_URL
+        value: sqlite:////mnt/data/books.db
+    healthCheck:
+      path: /ping
+      port: 80
