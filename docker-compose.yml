@@ -7,3 +7,4 @@ services:
       - "8000:8000"
     volumes:
       - "./books.db:/app/books.db"
+      - "./books:/app/books"
