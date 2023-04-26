@@ -17,6 +17,7 @@ class Book(BaseModel):
     author_name: str
     author_id: str
     bookfile: str
+    description: str
 
 
 # Define the SQLAlchemy engine and session
@@ -35,6 +36,7 @@ class BookORM(Base):
     author_name = Column(String)
     author_id = Column(String)
     bookfile = Column(String)
+    description = Column(String)
 
 # Create the books table in the database
 Base.metadata.create_all(bind=engine)
@@ -78,7 +80,7 @@ async def get_book(book_id: int):
 
 # Define the endpoint to add a book
 @router.post("/books")
-async def add_book(bookname: str = Form(...), author_name: str = Form(...), image_url: UploadFile = File(...), authorid: str = Form(...), bookfile: UploadFile = File(...)):
+async def add_book(bookname: str = Form(...), author_name: str = Form(...), image_url: UploadFile = File(...), authorid: str = Form(...), bookfile: UploadFile = File(...), description: str = Form(...)):
     # Save the uploaded file to disk
     path = 'books'
     path2 = 'images'
@@ -90,9 +92,9 @@ async def add_book(bookname: str = Form(...), author_name: str = Form(...), imag
         os.system("mkdir images")
     file_location = f"books/{bookfile.filename}"
     image_location = f"images/{image_url.filename}"
-    book = Book(bookname=bookname, image_url=image_location ,author_name=author_name, author_id=authorid, bookfile=file_location)
+    book = Book(bookname=bookname, image_url=image_location ,author_name=author_name, author_id=authorid, bookfile=file_location, description=description)
     session = SessionLocal()
-    book_orm = BookORM(bookname=book.bookname, image_url=book.image_url, author_name=book.author_name, author_id=book.author_id, bookfile=book.bookfile)
+    book_orm = BookORM(bookname=book.bookname, image_url=book.image_url, author_name=book.author_name, author_id=book.author_id, bookfile=book.bookfile, description=book.description)
     try:
         session.add(book_orm)
         session.commit()
