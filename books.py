@@ -15,7 +15,7 @@ class Book(BaseModel):
     bookname: str
     image_url: str
     author_name: str
-    author_id: int
+    author_id: str
     bookfile: str
 
 
@@ -33,7 +33,7 @@ class BookORM(Base):
     bookname = Column(String, unique=True)
     image_url = Column(String)
     author_name = Column(String)
-    author_id = Column(Integer)
+    author_id = Column(String)
     bookfile = Column(String)
 
 # Create the books table in the database
@@ -78,7 +78,7 @@ async def get_book(book_id: int):
 
 # Define the endpoint to add a book
 @router.post("/books")
-async def add_book(bookname: str = Form(...), author_name: str = Form(...), image_url: UploadFile = File(...), authorid: int = Form(...), bookfile: UploadFile = File(...)):
+async def add_book(bookname: str = Form(...), author_name: str = Form(...), image_url: UploadFile = File(...), authorid: str = Form(...), bookfile: UploadFile = File(...)):
     # Save the uploaded file to disk
     path = 'books'
     path2 = 'images'
