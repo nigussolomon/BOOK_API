@@ -37,11 +37,7 @@ async def get_downloads(user_id: str):
         for book in books:
             data = session.query(BookORM).filter(BookORM.id == book.bookid).first()
             downloads.append(
-                {
-                    "id": book.id,
-                    "bookname": data.bookname,
-                    "author": data.author_name
-                }
+                data
             )
         if books != []:
             return {"downloads": downloads, "status": "success"}

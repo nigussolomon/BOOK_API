@@ -13,6 +13,7 @@ router = APIRouter()
 # Define the Book model
 class Book(BaseModel):
     bookname: str
+    image_url: str
     author_name: str
     author_id: int
     bookfile: str
@@ -30,6 +31,7 @@ class BookORM(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     bookname = Column(String, unique=True)
+    image_url = Column(String)
     author_name = Column(String)
     author_id = Column(Integer)
     bookfile = Column(String)
@@ -52,6 +54,18 @@ async def get_books():
     finally:
         session.close()
     
+@router.get("/images/{book_id}")
+async def get_image(book_id: str):
+    try:
+        session = SessionLocal()
+        book = session.query(BookORM).filter(BookORM.id == book_id).first()
+        session.close()
+        return FileResponse(book.image_url, media_type='image/png')
+    except:
+        raise HTTPException(status_code=500, detail="Unexpected Error")
+    finally:
+        session.close()
+
 
 
 # Define the endpoint to get a specific book by ID
@@ -64,21 +78,28 @@ async def get_book(book_id: int):
 
 # Define the endpoint to add a book
 @router.post("/books")
-async def add_book(bookname: str = Form(...), author_name: str = Form(...), authorid: int = Form(...), bookfile: UploadFile = File(...)):
+async def add_book(bookname: str = Form(...), author_name: str = Form(...), image_url: UploadFile = File(...), authorid: int = Form(...), bookfile: UploadFile = File(...)):
     # Save the uploaded file to disk
     path = 'books'
+    path2 = 'images'
     isExist = os.path.exists(path)
+    isExist2 = os.path.exists(path2)
     if  not isExist:
         os.system("mkdir books")
+    if not isExist2:
+        os.system("mkdir images")
     file_location = f"books/{bookfile.filename}"
-    book = Book(bookname=bookname, author_name=author_name, author_id=authorid, bookfile=file_location)
+    image_location = f"images/{image_url.filename}"
+    book = Book(bookname=bookname, image_url=image_location ,author_name=author_name, author_id=authorid, bookfile=file_location)
     session = SessionLocal()
-    book_orm = BookORM(bookname=book.bookname, author_name=book.author_name, author_id=book.author_id, bookfile=book.bookfile)
+    book_orm = BookORM(bookname=book.bookname, image_url=book.image_url, author_name=book.author_name, author_id=book.author_id, bookfile=book.bookfile)
     try:
         session.add(book_orm)
         session.commit()
         with open(file_location, "wb") as file:
             shutil.copyfileobj(bookfile.file, file)
+        with open(image_location, "wb") as file:
+            shutil.copyfileobj(image_url.file, file)
     except IntegrityError:
         session.rollback()
         raise HTTPException(status_code=400, detail="Book already exists")
