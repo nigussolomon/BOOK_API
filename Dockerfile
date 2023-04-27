@@ -16,4 +16,4 @@ EXPOSE 8000
 ENV DATABASE_URL sqlite:///./books.db
 
 # Run the application
-CMD [ "docker-compose", "up" ]
+CMD [ "docker", "compose", "up" ]
