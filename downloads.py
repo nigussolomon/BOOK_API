@@ -71,15 +71,11 @@ async def add_download(bookid: int, userid: str):
         download_orm = DownloadORM(bookid=download.bookid, userid=download.userid)
         book = session.query(BookORM).filter(BookORM.id == bookid).first()
         if book is not None:
-            prev_download = session.query(DownloadORM).filter(DownloadORM.bookid == bookid, DownloadORM.userid == userid).first()
-            if prev_download is None:
-                session.add(download_orm)
-                session.commit()
-            else:
-                return {"message": "Books already downloaded", "status": "success"}
+            session.add(download_orm)
+            session.commit()
+            return {"message": "Downloaded  successfully", "status": "success", "id": download_orm.id}
         else:
             return {"message": "Book Doesn't Exist", "status": "failed"}
-        return {"message": "Downloaded  successfully", "status": "success", "id": download_orm.id}
     except:
         raise HTTPException(status_code=500, detail="Unexpected Error")
     finally:
