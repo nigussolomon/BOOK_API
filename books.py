@@ -104,7 +104,7 @@ async def add_book(bookname: str = Form(...), author_name: str = Form(...), imag
             shutil.copyfileobj(image_url.file, file)
     except IntegrityError:
         session.rollback()
-        raise HTTPException(status_code=400, detail="Book already exists")
+        return {"message": "Book already exists", "status": "failed"}
     finally:
         session.close()
     return {"message": "Book added successfully", "status": "success"}
